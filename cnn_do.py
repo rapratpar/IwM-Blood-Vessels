@@ -65,7 +65,7 @@ full_mask = reconstruct_from_patches(y_pred, image_shape, patch_size=64, stride=
 # binarizacja, jeśli chcesz np. naczynia jako 0/1
 binary_mask = (full_mask > 0.5).astype(np.uint8)
 
-# 🔍 Wyświetlanie
+# Wyświetlanie
 plt.figure(figsize=(15, 5))
 
 plt.subplot(1, 3, 1)

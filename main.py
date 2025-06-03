@@ -16,71 +16,71 @@ SCALE_FACTOR = 0.8
 MODEL_NAME = "full_knn_3.pkl"
 PATCH_SIZE = 5
 
-class ImageProcessor:
+# class ImageProcessor:
 
-    def __init__(self, img_path, fov_path=None):
-        self.original = cv2.imread(img_path)
-        if self.original is None:
-            raise ValueError("Nie udało się wczytać obrazu.")
-        self.img = self.original[:, :, 1]  # zielony kanał
-        self.fov = cv2.imread(fov_path, cv2.IMREAD_GRAYSCALE) if fov_path else None
+#     def __init__(self, img_path, fov_path=None):
+#         self.original = cv2.imread(img_path)
+#         if self.original is None:
+#             raise ValueError("Nie udało się wczytać obrazu.")
+#         self.img = self.original[:, :, 1]  # zielony kanał
+#         self.fov = cv2.imread(fov_path, cv2.IMREAD_GRAYSCALE) if fov_path else None
 
-    def process_image(self):
-        fig, axs = plt.subplots(2, 4, figsize=(16, 8))
-        axs = axs.ravel()
+#     def process_image(self):
+#         fig, axs = plt.subplots(2, 4, figsize=(16, 8))
+#         axs = axs.ravel()
 
-        # 1. Zielony kanał
-        img = self.img
-        axs[0].imshow(img, cmap='gray')
-        axs[0].set_title("Zielony kanał")
-        axs[0].axis("off")
+#         # 1. Zielony kanał
+#         img = self.img
+#         axs[0].imshow(img, cmap='gray')
+#         axs[0].set_title("Zielony kanał")
+#         axs[0].axis("off")
 
-        # 2. Normalizacja histogramu
-        img = cv2.equalizeHist(img)
-        axs[1].imshow(img, cmap='gray')
-        axs[1].set_title("Equalizacja histogramu")
-        axs[1].axis("off")
+#         # 2. Normalizacja histogramu
+#         img = cv2.equalizeHist(img)
+#         axs[1].imshow(img, cmap='gray')
+#         axs[1].set_title("Equalizacja histogramu")
+#         axs[1].axis("off")
 
-        # 3. Gauss
-        img = gaussian(img, sigma=10)
-        axs[2].imshow(img, cmap='gray')
-        axs[2].set_title("Filtr Gaussa")
-        axs[2].axis("off")
+#         # 3. Gauss
+#         img = gaussian(img, sigma=10)
+#         axs[2].imshow(img, cmap='gray')
+#         axs[2].set_title("Filtr Gaussa")
+#         axs[2].axis("off")
 
-        # 4. Filtr Frangi
-        img = frangi(img)
-        axs[3].imshow(img, cmap='gray')
-        axs[3].set_title("Filtr Frangi")
-        axs[3].axis("off")
+#         # 4. Filtr Frangi
+#         img = frangi(img)
+#         axs[3].imshow(img, cmap='gray')
+#         axs[3].set_title("Filtr Frangi")
+#         axs[3].axis("off")
 
-        # 5. Morfologia
-        img = dilation(img, disk(4))
-        img = erosion(img, disk(4))
-        axs[4].imshow(img, cmap='gray')
-        axs[4].set_title("Morfologia")
-        axs[4].axis("off")
+#         # 5. Morfologia
+#         img = dilation(img, disk(4))
+#         img = erosion(img, disk(4))
+#         axs[4].imshow(img, cmap='gray')
+#         axs[4].set_title("Morfologia")
+#         axs[4].axis("off")
 
-        # 6. Otsu
-        t = threshold_otsu(img)
-        binary = img > t * 0.1
-        axs[5].imshow(binary, cmap='gray')
-        axs[5].set_title("Progowanie Otsu")
-        axs[5].axis("off")
+#         # 6. Otsu
+#         t = threshold_otsu(img)
+#         binary = img > t * 0.1
+#         axs[5].imshow(binary, cmap='gray')
+#         axs[5].set_title("Progowanie Otsu")
+#         axs[5].axis("off")
 
-        # 7. Maska FOV
-        if self.fov is not None:
-            binary[self.fov == 0] = 0
-            axs[6].imshow(self.fov, cmap='gray')
-            axs[6].set_title("Maska FOV")
-            axs[6].axis("off")
+#         # 7. Maska FOV
+#         if self.fov is not None:
+#             binary[self.fov == 0] = 0
+#             axs[6].imshow(self.fov, cmap='gray')
+#             axs[6].set_title("Maska FOV")
+#             axs[6].axis("off")
 
-        # 8. Wynik końcowy
-        axs[7].imshow(binary, cmap='gray')
-        axs[7].set_title("Wynik końcowy")
-        axs[7].axis("off")
+#         # 8. Wynik końcowy
+#         axs[7].imshow(binary, cmap='gray')
+#         axs[7].set_title("Wynik końcowy")
+#         axs[7].axis("off")
 
-        plt.tight_layout()
-        plt.show()
+#         plt.tight_layout()
+#         plt.show()
 
 
 # Użycie:
@@ -209,7 +209,7 @@ def create_mode():
         image = cv2.imread(base_img)
         manual = cv2.imread(base_manual)
         mask = cv2.imread(base_mask)
-        print("XD")
+        # print("XD")
 
         # Skalowanie obrazów
         image = cv2.resize(image, (0, 0), fx=SCALE_FACTOR, fy=SCALE_FACTOR)
@@ -352,7 +352,7 @@ def predict_img(knn_clasifier):
 
 
 #create_patches_and_labels(image,manual)
-#create_mode();
+create_mode()
 
 knn_clasifier = load_model()
 print("wczytany")
@@ -360,7 +360,8 @@ print("wczytany")
 predict_img(knn_clasifier)
 
 
-
+# najpierw create_mode(), jak odpalony to zakomentować go i dać predict_img
+# predict_img na guzik
 
 
 

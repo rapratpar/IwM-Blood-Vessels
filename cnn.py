@@ -97,8 +97,8 @@ history = model.fit(
 
 # Ocena modelu na danych testowych
 #test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=1)
-#print(f"\n✅ Test Loss: {test_loss:.4f}")
-#print(f"✅ Test Accuracy: {test_accuracy:.4f}")
+#print(f"\nTest Loss: {test_loss:.4f}")
+#print(f"Test Accuracy: {test_accuracy:.4f}")
 
 from sklearn.metrics import precision_score, recall_score
 
