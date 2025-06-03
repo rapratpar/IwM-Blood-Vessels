@@ -6,21 +6,16 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add the project directory to path if needed
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Create a simple GUI with three buttons
 def main():
-    # Create the main window
     root = tk.Tk()
     root.title("Wykrywanie naczyń dna siatkówki oka")
-    root.geometry("500x300")
+    root.geometry("500x350")
     
-    # Create a frame for buttons
     frame = tk.Frame(root)
     frame.pack(pady=20)
     
-    # Create buttons
     btn_detect = tk.Button(
         frame, 
         text="Algorytm", 
@@ -48,17 +43,23 @@ def main():
     )
     btn_predict.pack(pady=10)
     
-    # Start the main loop
+    btn_compare = tk.Button(
+        frame, 
+        text="Compare Images", 
+        command=run_comparison,
+        width=25,
+        height=2
+    )
+    btn_compare.pack(pady=10)
+    
     root.mainloop()
 
 def run_xd_detection():
     """Run the vessel detection from xd.py"""
     try:
-        # Use the default files as in xd.py
         image_name = 'images/01_h.jpg'
         image_fov = 'images_mask/01_h_mask.tif'
 
-        # Run the function from xd module
         import cv2
         from xd import detect_vessels
         
@@ -76,12 +77,10 @@ def run_xd_detection():
 def run_cnn_do():
     """Run the CNN model from cnn_do.py"""
     try:
-        # Use the default files as in cnn_do.py
         base_img = "images/10_h.jpg"
         base_manual = "images_manual/10_h.tif"
         base_mask = "images_mask/10_h_mask.tif"
         
-        # Run the functions from cnn_do module
         import cv2
         import numpy as np
         import tensorflow as tf
@@ -98,7 +97,6 @@ def run_cnn_do():
             
         manual = cv2.cvtColor(manual, cv2.COLOR_BGR2GRAY)
         
-        # Process with the CNN
         img_patches, mask_patches = extract_patches(image, manual)
         img_patches = img_patches.astype('float32') / 255.0
         mask_patches = mask_patches.astype('float32') / 255.0
@@ -113,7 +111,6 @@ def run_cnn_do():
         full_mask = reconstruct_from_patches(y_pred, image_shape)
         binary_mask = (full_mask > 0.5).astype('uint8')
         
-        # Display results
         plt.figure(figsize=(15, 5))
         
         plt.subplot(1, 3, 1)
@@ -136,10 +133,48 @@ def run_cnn_do():
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
+def run_comparison():
+    """Compare a prediction image with a ground truth manual segmentation"""
+    try:
+        prediction_path = filedialog.askopenfilename(
+            title="Select Prediction Image",
+            filetypes=(("Image files", "*.jpg;*.jpeg;*.png;*.tif;*.tiff"), ("All files", "*.*"))
+        )
+        
+        if not prediction_path:
+            return  
+            
+        manual_path = filedialog.askopenfilename(
+            title="Select Ground Truth Image (from images_manual)",
+            initialdir=os.path.join(os.path.dirname(os.path.abspath(__file__)), "images_manual"),
+            filetypes=(("TIFF files", "*.tif;*.tiff"), ("All files", "*.*"))
+        )
+        
+        if not manual_path:
+            return  
+        
+        threshold = 128
+        
+        from countMeasures import calculate_metrics, visualize_comparison
+        
+        metrics = calculate_metrics(prediction_path, manual_path, threshold)
+        
+        metrics_msg = (
+            f"Comparison Results:\n\n"
+            f"Accuracy: {metrics['accuracy']:.4f}\n"
+            f"Sensitivity: {metrics['sensitivity']:.4f}\n"
+            f"Specificity: {metrics['specificity']:.4f}"
+        )
+        messagebox.showinfo("Metrics", metrics_msg)
+        
+        visualize_comparison(prediction_path, manual_path, threshold)
+        
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
 def run_main_prediction():
     """Run the prediction from main.py"""
     try:
-        # Load the model and predict directly as in main.py
         from main import load_model, predict_img
         
         knn_classifier = load_model()

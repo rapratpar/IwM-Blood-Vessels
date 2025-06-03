@@ -71,6 +71,11 @@ def detect_vessels(img, image_fov):
     plt.tight_layout()
     plt.show()
 
+    output_filename="xd.jpg"
+    final_img_uint8 = (final_masked * 255).astype(np.uint8)
+    cv2.imwrite(output_filename, final_img_uint8)
+    print(f"Z pliku xd.py zapisano {output_filename}")
+
     return final_masked
 
 

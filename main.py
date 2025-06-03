@@ -16,78 +16,6 @@ SCALE_FACTOR = 0.8
 MODEL_NAME = "full_knn_3.pkl"
 PATCH_SIZE = 5
 
-# class ImageProcessor:
-
-#     def __init__(self, img_path, fov_path=None):
-#         self.original = cv2.imread(img_path)
-#         if self.original is None:
-#             raise ValueError("Nie udało się wczytać obrazu.")
-#         self.img = self.original[:, :, 1]  # zielony kanał
-#         self.fov = cv2.imread(fov_path, cv2.IMREAD_GRAYSCALE) if fov_path else None
-
-#     def process_image(self):
-#         fig, axs = plt.subplots(2, 4, figsize=(16, 8))
-#         axs = axs.ravel()
-
-#         # 1. Zielony kanał
-#         img = self.img
-#         axs[0].imshow(img, cmap='gray')
-#         axs[0].set_title("Zielony kanał")
-#         axs[0].axis("off")
-
-#         # 2. Normalizacja histogramu
-#         img = cv2.equalizeHist(img)
-#         axs[1].imshow(img, cmap='gray')
-#         axs[1].set_title("Equalizacja histogramu")
-#         axs[1].axis("off")
-
-#         # 3. Gauss
-#         img = gaussian(img, sigma=10)
-#         axs[2].imshow(img, cmap='gray')
-#         axs[2].set_title("Filtr Gaussa")
-#         axs[2].axis("off")
-
-#         # 4. Filtr Frangi
-#         img = frangi(img)
-#         axs[3].imshow(img, cmap='gray')
-#         axs[3].set_title("Filtr Frangi")
-#         axs[3].axis("off")
-
-#         # 5. Morfologia
-#         img = dilation(img, disk(4))
-#         img = erosion(img, disk(4))
-#         axs[4].imshow(img, cmap='gray')
-#         axs[4].set_title("Morfologia")
-#         axs[4].axis("off")
-
-#         # 6. Otsu
-#         t = threshold_otsu(img)
-#         binary = img > t * 0.1
-#         axs[5].imshow(binary, cmap='gray')
-#         axs[5].set_title("Progowanie Otsu")
-#         axs[5].axis("off")
-
-#         # 7. Maska FOV
-#         if self.fov is not None:
-#             binary[self.fov == 0] = 0
-#             axs[6].imshow(self.fov, cmap='gray')
-#             axs[6].set_title("Maska FOV")
-#             axs[6].axis("off")
-
-#         # 8. Wynik końcowy
-#         axs[7].imshow(binary, cmap='gray')
-#         axs[7].set_title("Wynik końcowy")
-#         axs[7].axis("off")
-
-#         plt.tight_layout()
-#         plt.show()
-
-
-# Użycie:
-#processor = ImageProcessor("images/01_h.jpg", "images_mask/01_h_mask.tif")
-#processor.process_image()
-
-
 def preprocess_image(img, mask):
     # Wyciągamy zielony kanał i normalizujemy
     green_channel = img[:, :, 1]
@@ -96,10 +24,7 @@ def preprocess_image(img, mask):
     # Wyostrzenie
     sharpened_image = filters.unsharp_mask(img_eq)
     clear_back(img_eq, mask)  # lub sharpened_image, jeśli chcesz maskować już wyostrzony
-    #plt.imshow(img_eq, cmap='gray')
-    #plt.title("Znormalizowany zielony kanał")
-    #plt.axis('off')
-    #plt.show()
+
 
     return sharpened_image
 def clear_back(img, mask, th = 100):
@@ -238,27 +163,7 @@ def create_mode():
     #features_resampled, labels_resampled = rus.fit_resample(features_reshaped, all_labels)
 #
     X_train, X_test, y_train, y_test = train_test_split(features, all_labels, test_size=0.3, random_state=0)
-    '''
-    print("Classifier")
-    param_dist = {
-        'n_neighbors': [5, 7, 9, 10,12],
-        'weights': ['uniform', 'distance'],
-        'p': [1, 2]
-    }
-    classifier = RandomizedSearchCV(
-        KNeighborsClassifier(),
-        param_distributions=param_dist,
-        n_iter=10,
-        cv=5,
-        scoring={
-            'f1': 'f1',
-            'recall': 'recall',
-            'precision': 'precision'
-        },
-        refit='f1',  # model końcowy będzie wybrany wg najlepszego f1
-        n_jobs=-1
-    )
-    '''
+
     print("Classifier")
 
     classifier = KNeighborsClassifier(
@@ -317,6 +222,11 @@ def prediction_to_mask(predictions, image_shape, patch_size=PATCH_SIZE):
     plt.axis('off')
     plt.show()
 
+    # zapis maski jako jpg
+    output_filename = "knn.jpg"
+    cv2.imwrite(output_filename, mask)
+    print(f"Zapisano wynik KNN na {output_filename}")
+
     return mask
 def predict_img(knn_clasifier):
     base_img = "images/10_h.jpg"
@@ -352,7 +262,7 @@ def predict_img(knn_clasifier):
 
 
 #create_patches_and_labels(image,manual)
-create_mode()
+# create_mode()
 
 knn_clasifier = load_model()
 print("wczytany")
