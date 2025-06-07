@@ -57,8 +57,30 @@ def main():
 def run_xd_detection():
     """Run the vessel detection from xd.py"""
     try:
-        image_name = 'images/01_h.jpg'
-        image_fov = 'images_mask/01_h_mask.tif'
+        img = filedialog.askopenfilename(
+            title="Select Prediction Image",
+            filetypes=(("Image files", "*.jpg;*.jpeg;*.png;*.tif;*.tiff"), ("All files", "*.*"))
+        )
+
+        # Główna ścieżka katalogu
+        base_dir = os.path.dirname(os.path.dirname(img)) + "/"
+
+        # Ścieżka od folderu `images` w dół
+        relative_path = os.path.relpath(img, base_dir)
+
+        # Nazwa pliku bez rozszerzenia
+        filename = os.path.splitext(os.path.basename(img))[0]
+
+        print("Główna ścieżka:", base_dir)  # C:/Users/rapra/Desktop/IwM/Oko/pythonProject/
+        print("Relatywna ścieżka:", relative_path)  # images/12_h.jpg
+        print("Nazwa pliku:", filename)  # 12_h
+
+        base_img = relative_path
+        base_manual = f"images_manual/{filename}.tif"
+        base_mask = f"images_mask/{filename}_mask.tif"
+
+        image_name = base_img
+        image_fov = base_mask
 
         import cv2
         from xd import detect_vessels
@@ -70,17 +92,35 @@ def run_xd_detection():
             messagebox.showerror("Error", f"Failed to read image or mask file: {image_name}, {image_fov}")
             return
         
-        detect_vessels(image, fov)
+            detect_vessels(image, fov)
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 def run_cnn_do():
     """Run the CNN model from cnn_do.py"""
     try:
-        base_img = "images/10_h.jpg"
-        base_manual = "images_manual/10_h.tif"
-        base_mask = "images_mask/10_h_mask.tif"
-        
+        img = filedialog.askopenfilename(
+            title="Select Prediction Image",
+            filetypes=(("Image files", "*.jpg;*.jpeg;*.png;*.tif;*.tiff"), ("All files", "*.*"))
+        )
+
+        # Główna ścieżka katalogu
+        base_dir = os.path.dirname(os.path.dirname(img)) + "/"
+
+        # Ścieżka od folderu `images` w dół
+        relative_path = os.path.relpath(img, base_dir)
+
+        # Nazwa pliku bez rozszerzenia
+        filename = os.path.splitext(os.path.basename(img))[0]
+
+        print("Główna ścieżka:", base_dir)  # C:/Users/rapra/Desktop/IwM/Oko/pythonProject/
+        print("Relatywna ścieżka:", relative_path)  # images/12_h.jpg
+        print("Nazwa pliku:", filename)  # 12_h
+
+        base_img = relative_path
+        base_manual = f"images_manual/{filename}.tif"
+        base_mask = f"images_mask/{filename}_mask.tif"
+
         import cv2
         import numpy as np
         import tensorflow as tf
@@ -174,15 +214,23 @@ def run_comparison():
 
 def run_main_prediction():
     """Run the prediction from main.py"""
+
+    print("KAS")
     try:
         from main import load_model, predict_img
-        
+
+        prediction_path = filedialog.askopenfilename(
+            title="Select Prediction Image",
+            filetypes=(("Image files", "*.jpg;*.jpeg;*.png;*.tif;*.tiff"), ("All files", "*.*"))
+        )
+        print("HALOO?")
+        print("Prediciotn path", prediction_path)
         knn_classifier = load_model()
         if knn_classifier is None:
             messagebox.showerror("Error", "Failed to load KNN model")
             return
             
-        predict_img(knn_classifier)
+        predict_img(knn_classifier,prediction_path);
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 

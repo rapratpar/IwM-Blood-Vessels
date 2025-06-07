@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,6 +17,7 @@ from joblib import dump, load
 SCALE_FACTOR = 0.8
 MODEL_NAME = "full_knn_3.pkl"
 PATCH_SIZE = 5
+NEIGHBOURS = 3
 
 def preprocess_image(img, mask):
     # Wyciągamy zielony kanał i normalizujemy
@@ -167,7 +170,7 @@ def create_mode():
     print("Classifier")
 
     classifier = KNeighborsClassifier(
-        n_neighbors=3,
+        n_neighbors=NEIGHBOURS,
         weights='distance',
         p=1
     )
@@ -228,10 +231,24 @@ def prediction_to_mask(predictions, image_shape, patch_size=PATCH_SIZE):
     print(f"Zapisano wynik KNN na {output_filename}")
 
     return mask
-def predict_img(knn_clasifier):
-    base_img = "images/10_h.jpg"
-    base_manual = "images_manual/10_h.tif"
-    base_mask = "images_mask/10_h_mask.tif"
+def predict_img(knn_clasifier, img):
+    # Główna ścieżka katalogu
+    base_dir = os.path.dirname(os.path.dirname(img)) + "/"
+
+    # Ścieżka od folderu `images` w dół
+    relative_path = os.path.relpath(img, base_dir)
+
+    # Nazwa pliku bez rozszerzenia
+    filename = os.path.splitext(os.path.basename(img))[0]
+
+    print("Główna ścieżka:", base_dir)  # C:/Users/rapra/Desktop/IwM/Oko/pythonProject/
+    print("Relatywna ścieżka:", relative_path)  # images/12_h.jpg
+    print("Nazwa pliku:", filename)  # 12_h
+
+    base_img = relative_path
+    base_manual = f"images_manual/{filename}.tif"
+    base_mask = f"images_mask/{filename}_mask.tif"
+
     image = cv2.imread(base_img)
     manual = cv2.imread(base_manual)
     mask = cv2.imread(base_mask)
@@ -262,12 +279,11 @@ def predict_img(knn_clasifier):
 
 
 #create_patches_and_labels(image,manual)
-# create_mode()
-
+#create_mode()
 knn_clasifier = load_model()
 print("wczytany")
 
-predict_img(knn_clasifier)
+predict_img(knn_clasifier, "C:/Users/rapra/Desktop/IwM/Oko/pythonProject/images/13_h.jpg")
 
 
 # najpierw create_mode(), jak odpalony to zakomentować go i dać predict_img

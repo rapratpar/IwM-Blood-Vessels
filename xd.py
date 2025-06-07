@@ -14,7 +14,7 @@ def detect_vessels(img, image_fov):
     colorimage_b = img[:, :, 0]
     colorimage_g = cv2.equalizeHist(img[:, :, 1])
     colorimage_r = img[:, :, 2]
-    img = np.stack((colorimage_b, colorimage_g, colorimage_r), axis=2)
+    #img = np.stack((colorimage_b, colorimage_g, colorimage_r), axis=2)
 
     img = colorimage_g
     axs[0].imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -42,36 +42,32 @@ def detect_vessels(img, image_fov):
     axs[3].set_title("Filtr Frangi")
     axs[3].axis("off")
 
-    # 6. Morfologiczna dylatacja i erozja
-    img = mp.dilation(img, mp.disk(4))
-    img = mp.erosion(img, mp.disk(4))
-    axs[4].imshow(img, cmap='gray')
-    axs[4].set_title("Morfologia (dylacja+erozja)")
-    axs[4].axis("off")
 
     # 7. Progowanie Otsu
     thresh = threshold_otsu(img)
     binary_img = img > thresh * 0.1
-    axs[5].imshow(binary_img, cmap='gray')
-    axs[5].set_title("Po progowaniu Otsu")
-    axs[5].axis("off")
+    axs[4].imshow(binary_img, cmap='gray')
+    axs[4].set_title("Po progowaniu Otsu")
+    axs[4].axis("off")
 
     # 8. Nakładanie maski FOV (ograniczenie do obszaru siatkówki)
     final_masked = np.copy(binary_img)
     final_masked[image_fov == 0] = 0
-    axs[6].imshow(image_fov, cmap='gray')
-    axs[6].set_title("Maska FOV")
-    axs[6].axis("off")
+    axs[5].imshow(image_fov, cmap='gray')
+    axs[5].set_title("Maska FOV")
+    axs[5].axis("off")
 
     # 9. Obraz końcowy
-    axs[7].imshow(final_masked, cmap='gray')
-    axs[7].set_title("Obraz końcowy")
-    axs[7].axis("off")
+    axs[6].imshow(final_masked, cmap='gray')
+    axs[6].set_title("Obraz końcowy")
+    axs[6].axis("off")
 
+    axs[7].axis("off")
+    axs[7].set_visible(False)
     plt.tight_layout()
     plt.show()
 
-    output_filename="xd.jpg"
+    output_filename="przetwarzanie.jpg"
     final_img_uint8 = (final_masked * 255).astype(np.uint8)
     cv2.imwrite(output_filename, final_img_uint8)
     print(f"Z pliku xd.py zapisano {output_filename}")
@@ -82,7 +78,7 @@ def detect_vessels(img, image_fov):
 image_name = 'images/01_h.jpg'
 image_fov = 'images_mask/01_h_mask.tif'
 
-image = cv2.imread(image_name)
-fov = cv2.imread(image_fov, cv2.IMREAD_GRAYSCALE)
+#image = cv2.imread(image_name)
+#fov = cv2.imread(image_fov, cv2.IMREAD_GRAYSCALE)
 
-result = detect_vessels(image, fov)
+#result = detect_vessels(image, fov)

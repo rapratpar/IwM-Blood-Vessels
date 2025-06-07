@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 
@@ -82,7 +84,10 @@ def predict_and_save(image, manual, output_filename="cnn_prediction.jpg"):
     
     return binary_mask, output_filename
 
-if __name__ == "__main__":
+
+
+def cnn_predict(img):
+
     base_img = "images/10_h.jpg"
     base_manual = "images_manual/10_h.tif"
     base_mask = "images_mask/10_h_mask.tif"
@@ -90,5 +95,6 @@ if __name__ == "__main__":
     manual = cv2.imread(base_manual)
     mask = cv2.imread(base_mask)
     manual = cv2.cvtColor(manual, cv2.COLOR_BGR2GRAY)
-    
+
     predict_and_save(image, manual, "cnn_.jpg")
+
